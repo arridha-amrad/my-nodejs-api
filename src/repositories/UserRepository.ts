@@ -1,29 +1,27 @@
+import db from "@/db";
+import { users } from "@/db/schema";
+import { UpdateUserDTO } from "@/dto/User";
+import { eq } from "drizzle-orm";
 import { injectable } from "tsyringe";
-import { User } from "@/models/User";
-
-// Mock database
-const users: User[] = [
-  {
-    id: 1,
-    email: "ari@mail.com",
-    name: "ari",
-  },
-  {
-    id: 2,
-    email: "amrad@mail.com",
-    name: "amrad",
-  },
-];
 
 @injectable()
 export class UserRepository {
   async findAll() {
-    return users;
+    return db.select().from(users);
   }
 
-  async create(userData: User) {
-    const newUser = { id: users.length + 1, ...userData };
-    users.push(newUser);
-    return newUser;
+  async create(userData: typeof users.$inferInsert) {
+    return db.insert(users).values(userData).returning();
+  }
+
+  async findById(userId: string) {
+    return db.select().from(users).where(eq(users.id, userId));
+  }
+
+  async remove(userId: string) {
+    return db.delete(users).where(eq(users.id, userId)).returning();
+  }
+  async update(userId: string, data: UpdateUserDTO) {
+    return db.update(users).set(data).where(eq(users.id, userId)).returning();
   }
 }

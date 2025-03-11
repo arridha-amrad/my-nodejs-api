@@ -1,16 +1,11 @@
 import "reflect-metadata";
 import "tsconfig-paths/register";
 
-import express from "express";
 import cors from "cors";
+import express from "express";
 import { PORT } from "./config/env";
 
-import { container } from "./container";
-import { UserController } from "./controllers/UserController";
-import { userRoutes } from "./routes/userRoutes";
-
-// Resolve dependencies
-const userController = container.resolve(UserController);
+import userRoutes from "./routes/userRoutes";
 
 const app = express();
 
@@ -18,8 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use("/api", userRoutes(userController));
+app.use("/api/v1/users", userRoutes);
 
 // Start server
 const server = app.listen(PORT, () => {
